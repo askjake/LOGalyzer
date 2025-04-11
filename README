@@ -1,0 +1,61 @@
+# LOGalyzer 📊  
+_End‑to‑end ingestion, parsing & anomaly‑detection pipeline for large‑scale Android‑TV / STB logs_
+
+![LOGalyzer banner](docs/img/banner.png)
+
+LOGalyzer (formerly **logJAM**) automates everything from pulling raw device logs all the way to interactive
+dashboards:
+
+1. **Ingest** hundreds of gigabytes of compressed logs into PostgreSQL.
+2. **Parse & normalise** the Video/Audio Rendering (VAR) lines with a fault‑tolerant Python parser.
+3. **Analyse** each playback session (varnalyzer) & store JSON summaries.
+4. **Detect anomalies** with both LSTM and Auto‑Encoder models.
+5. **Visualise** results in Apache Superset dashboards.
+6. **Automate field updates** (e.g. _jam‑software_ endpoint).
+
+---
+
+## Table of Contents
+1. [Features](#features)
+2. [Architecture](#architecture)
+3. [Quick Start](#quick-start)
+4. [Directory Layout](#directory-layout)
+5. [Configuration](#configuration)
+6. [CLI Cookbook](#cli-cookbook)
+7. [Superset Dashboards](#superset-dashboards)
+8. [Concurrency Scripts](#concurrency-scripts)
+9. [Development & Contributing](#development--contributing)
+10. [License](#license)
+
+---
+
+## Features
+| Area | Highlights |
+|------|------------|
+| **Ingestion** | • Multi‑process gzip reader<br>• Connection‑pooled inserts (`psycopg2.pool`)<br>• Auto‑creates `R##########` tables on the fly |
+| **Parsing** | • Supports multiple timestamp formats<br>• Extracts `category`, `function`, `data`, `event_type`, etc.<br>• MD5 hash for idempotent loads |
+| **Session analysis** | • Detects `CHANGE_CONTENT` boundaries<br>• Counts BlackScreen / VideoFreeze / DisplayDrop<br>• Collects HDMI, trick‑mode, standby events |
+| **ML anomaly detection** | • LSTM‑based time‑series detector<br>• Auto‑Encoder reconstruction error<br>• Consolidated results in `anomalies_consolidated` |
+| **Dashboards** | • Parameterised SQL templates (time span / granularity)<br>• Scatter, bar & line charts for exec overviews |
+| **Automation** | • `jam-software` Flask route to push apps & record JSON events |
+| **Ops** | • Pure‑Bash pipeline launcher (`run_for_rxids.sh`) with per‑step flags & 5‑way parallelism |
+
+---
+
+## Architecture
+```text
+┌──────────┐     gzip     ┌──────────────┐   parsed rows  ┌──────────────┐
+│  CCShare │ ───────────►│ ingestion/   │───────────────►│  PostgreSQL  │
+│   (NFS)  │             │ log_ingest.py│                │     logs     │
+└──────────┘             └──────────────┘                └────┬─────────┘
+                                                              │
+                         sessions & JSON summaries            │
+                     ┌───────────────────────────┐            │
+                     │ analysis/varnalyzer.py    │────────────┘
+                     └───────────────────────────┘
+                               │
+                               ▼
+                 anomalies_consolidated (LSTM/AE)
+                               │
+                               ▼
+                       Apache Superset 📊
