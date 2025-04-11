@@ -1,0 +1,81 @@
+.
+├── analysis
+│   ├── anomaly_detection
+│   │   ├── 1autoencoder.py
+│   │   ├── 3d_analysis.py
+│   │   ├── autoencoder_fixed.py
+│   │   ├── autoencoder.py
+│   │   ├── lstm_anomaly.py
+│   │   ├── lstm_anomaly.py2
+│   │   └── sequence_count.py
+│   ├── log_analysis_gpu.py
+│   ├── video_audio_analyzer.py
+│   └── visualization
+│       ├── embed_and_plot.py
+│       ├── superset_connector.py
+│       └── visualize_sequence_count_streamlit.py
+├── credentials.txt
+├── flowchart.dot
+├── ingestion
+│   ├── db
+│   │   ├── __init__.py
+│   │   ├── neo4j_storer.py
+│   │   ├── postgres_storer.py
+│   │   ├── schema_manager.py
+│   │   └── utils.py
+│   ├── grapher
+│   ├── grapher.py
+│   ├── __init__.py
+│   ├── linking
+│   │   ├── datasets
+│   │   │   └── known_events.json
+│   │   ├── enricher_bert.py
+│   │   ├── enricher.py
+│   │   ├── gather_anomalies.py
+│   │   ├── __init__.py
+│   │   └── ml_trainer.py
+│   ├── log_ingest.py
+│   ├── parsers
+│   │   ├── base_parser.py
+│   │   ├── __init__.py
+│   │   ├── ktrap.py
+│   │   ├── patterns.py
+│   │   └── var.py
+│   ├── pycallgraph.png
+│   └── utils.py
+├── logJAM_gui.py
+├── lstm_mse_R1947558156.png
+├── lstm_mse_R1963244619.png
+├── models
+│   ├── encoded_Master128.pt
+│   ├── encoded_Master16.pt
+│   ├── encoded_Master256.pt
+│   ├── encoded_Master4096.pt
+│   ├── encoded_Master64.pt
+│   ├── lstm_Master128.pt
+│   ├── lstm_Master16.pt
+│   ├── lstm_Master256.pt
+│   ├── lstm_Master4096.pt
+│   ├── lstm_Master64.pt
+│   └── lstm_Master8.pt
+├── old
+│   ├── db
+│   │   ├── neo4j_storer.py
+│   │   ├── postgres_storer.py
+│   │   └── schema_manager.py
+│   ├── exclude_folders.txt
+│   ├── linking
+│   │   └── enricher.py
+│   ├── log_analysis_gpu.py
+│   ├── logJAM_lab.py
+│   └── parsers
+│       ├── base_parser.py
+│       └── patterns.py
+├── out.gv
+├── out.png
+├── project_structure.txt
+├── pycallgraph.png
+├── requirements.txt
+└── versionControl.py
+
+14 directories, 65 files
