@@ -59,3 +59,104 @@ dashboards:
                                │
                                ▼
                        Apache Superset 📊
+
+
+Quick Start
+Prerequisites
+
+Python 3.9+
+
+PostgreSQL 13+
+
+Apache Superset (optional but recommended)
+
+Access to the CC Share log folder
+
+bash
+Copy
+Edit
+# 1. Clone
+git clone https://github.com/askjake/LOGalyzer.git
+cd LOGalyzer
+
+# 2. Create venv
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Configure DB & credentials
+cp sample.credentials.json credentials.txt   # edit host/user/pw
+
+# 4. Ingest a single RXID
+python ingestion/log_ingest.py \
+      --start_date 2025-04-01 \
+      -w 10 \
+      -d /ccshare/logs/smplogs/R1911703992
+
+# 5. Analyse & detect anomalies
+python analysis/varnalyzer.py --start_time 2025-04-01 --table_name R1911703992
+python analysis/anomaly_detection/lstm_anomaly.py  --mode analyze --table_name R1911703992
+python analysis/anomaly_detection/autoencoder.py   --mode analyze --table_name R1911703992
+Directory Layout
+bash
+Copy
+Edit
+LOGalyzer/
+│
+├── ingestion/                 # raw‑log ingestion utilities
+│   └── log_ingest.py
+├── analysis/
+│   ├── varnalyzer.py          # session extractor
+│   └── anomaly_detection/
+│       ├── lstm_anomaly.py
+│       └── autoencoder.py
+├── scripts/
+│   └── run_for_rxids.sh       # parallel launcher
+├── web/                       # Flask micro‑service (jam‑software)
+├── dashboards/                # Superset .json exports & SQL templates
+└── README.md
+Configuration
+File	Purpose
+credentials.txt	JSON with DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, etc.
+config.json	STB → IP / Linux‑PC mapping for jam-software
+.env (optional)	Any environment overrides
+CLI Cookbook
+bash
+Copy
+Edit
+# Ingest every RX table under CCShare since 1 April, 10‑way parallel
+python ingestion/log_ingest.py -w 10 --start_date 2025-04-01 -d /ccshare/logs/smplogs
+
+# Analyse a single table
+python analysis/varnalyzer.py --start_time 2025-04-01 --table_name R1946200615
+
+# Bulk pipeline with 5‑way concurrency, custom date, only ingest+varnalyzer
+scripts/run_for_rxids.sh -iv -s 2025-03-01 R1946200615 R1946167668
+Superset Dashboards
+Import the JSON in dashboards/ or copy the SQL templates.
+
+Two main datasets:
+
+video_audio_analysis – session summaries
+
+anomalies_consolidated – ML flags & customer markers
+
+Parameterised fields: {{ time_granularity }}, {{ days_span }}
+
+Concurrency Scripts
+run_for_rxids.sh supports:
+
+-s/--start YYYY‑MM‑DD – date for both ingestion & analysis
+
+-i (ingest), -v (varnalyzer), -a (LSTM + AE) – choose steps
+
+Up to 5 RXIDs in parallel, each step sequential per RXID.
+
+Development & Contributing
+Fork & branch (feature/your‑thing).
+
+Run pre‑commit install for black & flake8.
+
+PR against main with a clear description.
+CI (GitHub Actions) will lint & run unit tests.
+
+
